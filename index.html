@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#174b32">
+<meta name="description" content="Peace Valley-White Church Fire Department incident reporting">
+<link rel="manifest" href="manifest.webmanifest">
+<title>PVWC Incident Reporting</title>
+<style>
+:root{--green:#174b32;--green2:#236642;--pale:#edf5ef;--ink:#17231b;--muted:#637168;--line:#d7e1d9;--white:#fff;--red:#a12b2b}
+*{box-sizing:border-box}body{margin:0;background:#f3f6f3;color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:var(--green);color:white;padding:22px 16px 24px;text-align:center}header .mark{width:54px;height:54px;border:2px solid #cfe3d3;border-radius:50%;display:grid;place-items:center;margin:0 auto 9px;font-size:26px}header h1{font-size:clamp(21px,4vw,29px);margin:0;font-weight:800}header p{margin:5px 0 0;color:#d8e9dc;font-size:14px}
+main{max-width:980px;margin:20px auto;padding:0 14px 40px}.notice{background:#fff8e7;border:1px solid #ead7a4;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#594b28}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:15px;box-shadow:0 2px 8px #173e2410}
+.panel h2{font-size:17px;margin:0 0 14px;color:var(--green);padding-bottom:9px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;font-size:13px;font-weight:700;margin:0 0 5px;color:#34483b}
+input,select,textarea{width:100%;min-height:44px;border:1px solid #cbd7ce;border-radius:9px;padding:10px 11px;background:#fff;color:var(--ink);font:inherit;font-size:16px}textarea{min-height:112px;resize:vertical}input:focus,select:focus,textarea:focus{outline:3px solid #b8d9c2;border-color:var(--green2)}
+small.help{display:block;color:var(--muted);font-size:12px;margin-top:4px}.hidden{display:none!important}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}.btn{border:0;border-radius:10px;padding:13px 18px;min-height:48px;font-weight:750;font-size:15px;cursor:pointer}.primary{background:var(--green);color:white;flex:1}.secondary{background:#e8eee9;color:#1b3a27}.danger{background:#fff0f0;color:var(--red)}.btn:active{transform:translateY(1px)}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}.photo-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}.photo-list img{width:100%;height:95px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.checkrow{display:flex;align-items:center;gap:9px;margin-top:8px}.checkrow input{width:20px;min-height:20px}
+@media(max-width:620px){main{margin:12px auto;padding:0 10px 28px}.panel{padding:14px;border-radius:12px}.grid{grid-template-columns:1fr;gap:11px}.field.full{grid-column:auto}.actions{position:sticky;bottom:0;background:#f3f6f3;padding:10px 0 calc(10px + env(safe-area-inset-bottom));z-index:3}.btn{width:100%}}
+@media print{body{background:#fff;font-size:11pt}header{padding:12px;background:#fff!important;color:#000;border-bottom:2px solid #174b32}header p{color:#333}.mark{display:none!important}main{max-width:none;margin:0;padding:8px}.notice,.actions,.footer,.photo-hint{display:none!important}.panel{box-shadow:none;border:1px solid #aaa;break-inside:avoid;padding:10px;margin:8px 0}.panel h2{font-size:13pt}.grid{gap:8px}input,select,textarea{border:0;border-bottom:1px solid #aaa;border-radius:0;min-height:25px;padding:3px;font-size:11pt;background:transparent}textarea{min-height:55px}.field{break-inside:avoid}label{font-size:9pt}.photo-list img{height:110px;object-fit:contain}.hidden{display:none!important}input[type=file]{display:none}}
+</style>
+</head>
+<body>
+<header><div class="mark" aria-hidden="true">✚</div><h1>PVWC Incident Reporting</h1><p>Peace Valley–White Church Fire Department</p></header>
+<main>
+<div class="notice"><strong>Privacy:</strong> This form does not save or transmit reports. Information stays in this browser tab while you complete it. Generate a PDF and distribute it through your department's approved process. Close or clear the form when finished. Do not leave patient information on a shared device.</div>
+<form id="reportForm">
+<section class="panel">
+<h2>Incident details</h2>
+<div class="grid">
+<div class="field"><label for="type">Report type *</label><select id="type" required><option value="">Choose report type</option><option>Fire Incident</option><option>Motor Vehicle Accident</option><option>Patient / Medical Incident</option><option>General Incident</option></select></div>
+<div class="field"><label for="number">Incident / CAD number</label><input id="number" autocomplete="off" placeholder="Incident number"></div>
+<div class="field"><label for="date">Incident date *</label><input id="date" type="date" required></div>
+<div class="field"><label for="location">Incident location / address *</label><input id="location" required autocomplete="street-address"></div>
+<div class="field"><label for="dispatch">Dispatch time</label><input id="dispatch" type="time"></div>
+<div class="field"><label for="enroute">En route time</label><input id="enroute" type="time"></div>
+<div class="field"><label for="arrival">Arrival time</label><input id="arrival" type="time"></div>
+<div class="field"><label for="clear">Clear / available time</label><input id="clear" type="time"></div>
+</div></section>
+<section class="panel">
+<h2>Personnel & resources</h2><div class="grid">
+<div class="field"><label for="reporter">Reporting member name *</label><input id="reporter" required autocomplete="name"></div>
+<div class="field"><label for="memberno">Member number</label><input id="memberno"></div>
+<div class="field full"><label for="personnel">Responding personnel</label><textarea id="personnel" placeholder="List names and roles"></textarea></div>
+<div class="field full"><label for="apparatus">Apparatus / unit numbers</label><input id="apparatus" placeholder="Example: Engine 01, Tanker 1, 1606"></div>
+<div class="field full"><label for="mutual">Mutual aid / other agencies</label><textarea id="mutual" placeholder="Agency, units, personnel, or none"></textarea></div>
+</div></section>
+<section class="panel hidden" id="fireSection">
+<h2>Fire incident details</h2><div class="grid">
+<div class="field"><label for="firetype">Incident classification</label><select id="firetype"><option value="">Select</option><option>Structure fire</option><option>Vehicle fire</option><option>Brush / grass fire</option><option>Wildland fire</option><option>Alarm / investigation</option><option>Other</option></select></div>
+<div class="field"><label for="firestatus">Disposition</label><select id="firestatus"><option value="">Select</option><option>Extinguished</option><option>Contained</option><option>Controlled</option><option>No fire found</option><option>Referred / transferred</option><option>Other</option></select></div>
+<div class="field full"><label for="fireactions">Actions taken / fire conditions</label><textarea id="fireactions"></textarea></div>
+</div></section>
+<section class="panel hidden" id="mvaSection">
+<h2>Motor vehicle accident details</h2><div class="grid">
+<div class="field"><label for="vehicles">Number / type of vehicles</label><input id="vehicles"></div>
+<div class="field"><label for="hazards">Road / scene hazards</label><input id="hazards"></div>
+<div class="field"><label for="mvaactions">Actions taken</label><textarea id="mvaactions"></textarea></div>
+<div class="field"><label for="mvaagencies">Law enforcement / EMS / other agencies</label><textarea id="mvaagencies"></textarea></div>
+</div></section>
+<section class="panel hidden" id="medicalSection">
+<h2>Patient / medical information</h2><div class="grid">
+<div class="field"><label for="patient">Patient name or identifier</label><input id="patient" autocomplete="off"></div>
+<div class="field"><label for="patientdob">Date of birth / age</label><input id="patientdob"></div>
+<div class="field"><label for="chief">Chief complaint</label><input id="chief"></div>
+<div class="field"><label for="onset">Onset / history</label><input id="onset"></div>
+<div class="field"><label for="bp">Blood pressure</label><input id="bp" placeholder="mmHg"></div>
+<div class="field"><label for="pulse">Pulse</label><input id="pulse"></div>
+<div class="field"><label for="resp">Respirations</label><input id="resp"></div>
+<div class="field"><label for="spo2">SpO₂</label><input id="spo2"></div>
+<div class="field"><label for="temp">Temperature</label><input id="temp"></div>
+<div class="field"><label for="glucose">Blood glucose</label><input id="glucose"></div>
+<div class="field full"><label for="assessment">Assessment / findings</label><textarea id="assessment"></textarea></div>
+<div class="field full"><label for="treatment">Treatment / care provided</label><textarea id="treatment"></textarea></div>
+<div class="field"><label for="disposition">Patient disposition</label><select id="disposition"><option value="">Select</option><option>Transported by EMS</option><option>Refusal</option><option>Released to other agency</option><option>Not transported</option><option>Other</option></select></div>
+<div class="field"><label for="destination">Destination / receiving agency</label><input id="destination"></div>
+</div></section>
+<section class="panel hidden" id="generalSection">
+<h2>General incident details</h2><div class="grid">
+<div class="field"><label for="generaltype">Incident category</label><input id="generaltype" placeholder="Example: Public assistance, service call"></div>
+<div class="field full"><label for="generalactions">Actions taken</label><textarea id="generalactions"></textarea></div>
+</div></section>
+<section class="panel">
+<h2>Incident narrative</h2><div class="grid">
+<div class="field full"><label for="narrative">Narrative / sequence of events</label><textarea id="narrative" placeholder="Document the incident objectively, including actions and outcomes."></textarea></div>
+<div class="field full"><label for="attachments">Attach scene photos (optional)</label><input id="attachments" type="file" accept="image/*" multiple capture="environment"><small class="help photo-hint">Selected photos are held temporarily in this page and included in the printout where supported. They are not uploaded.</small><div id="photoList" class="photo-list"></div></div>
+</div></section>
+<section class="panel">
+<h2>Officer review</h2><div class="grid">
+<div class="field"><label for="officer">Reviewing officer name</label><input id="officer"></div>
+<div class="field"><label for="officerno">Officer member number / rank</label><input id="officerno"></div>
+<div class="field full"><label for="review">Review notes / corrective action</label><textarea id="review"></textarea></div>
+<div class="field full"><label for="signature">Officer signature (type full name)</label><input id="signature"></div>
+<div class="field"><label for="reviewdate">Review date</label><input id="reviewdate" type="date"></div>
+</div></section>
+<div class="actions"><button class="btn primary" type="button" id="pdfBtn">Generate / Print PDF</button><button class="btn secondary" type="button" id="clearBtn">Clear form</button></div>
+</form>
+<div class="footer">PVWC Fire Department • Incident reports are completed and distributed by department personnel.</div>
+</main>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const sections={ "Fire Incident":"fireSection","Motor Vehicle Accident":"mvaSection","Patient / Medical Incident":"medicalSection","General Incident":"generalSection"};
+$("date").value=new Date().toISOString().slice(0,10);
+$("reviewdate").value=new Date().toISOString().slice(0,10);
+function updateType(){Object.values(sections).forEach(id=>$(id).classList.add("hidden"));const id=sections[$("type").value];if(id)$(id).classList.remove("hidden")}
+$("type").addEventListener("change",updateType);
+let photoUrls=[];
+$("attachments").addEventListener("change",e=>{photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];$("photoList").replaceChildren();Array.from(e.target.files||[]).forEach(file=>{if(!file.type.startsWith("image/"))return;const url=URL.createObjectURL(file);photoUrls.push(url);const img=document.createElement("img");img.src=url;img.alt="Attached incident photo";$("photoList").append(img)})});
+$("pdfBtn").addEventListener("click",()=>{if(!$("reportForm").reportValidity())return;document.title="PVWC-Incident-"+($("number").value.trim()||$("date").value||"Report");window.print()});
+$("clearBtn").addEventListener("click",()=>{if(!confirm("Clear all report information from this page? This cannot be undone."))return;$("reportForm").reset();$("date").value=new Date().toISOString().slice(0,10);$("reviewdate").value=new Date().toISOString().slice(0,10);$("photoList").replaceChildren();photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];updateType();window.scrollTo({top:0,behavior:"smooth"})});
+window.addEventListener("beforeunload",()=>photoUrls.forEach(URL.revokeObjectURL));
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+})();
+</script>
+</body></html>

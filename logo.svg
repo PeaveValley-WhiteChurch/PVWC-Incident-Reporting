@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+<defs><linearGradient id="axe" x2="0" y2="1"><stop stop-color="#eee"/><stop offset=".45" stop-color="#aab1b7"/><stop offset="1" stop-color="#fff"/></linearGradient><linearGradient id="wood" x2="0" y2="1"><stop stop-color="#9b6331"/><stop offset="1" stop-color="#42240f"/></linearGradient></defs>
+<rect width="500" height="500" fill="#fff"/>
+<g fill="none" stroke="#111" stroke-width="15" stroke-linejoin="round"><path d="M145 225 50 155 88 95 207 175M355 225l95-70-38-60-119 80" fill="url(#axe)"/><path d="M198 180 95 430l48 24 123-240M302 180l103 250-48 24-123-240" fill="url(#wood)"/></g>
+<circle cx="250" cy="250" r="122" fill="#fff" stroke="#b18a42" stroke-width="16"/><circle cx="250" cy="250" r="109" fill="none" stroke="#171717" stroke-width="6"/>
+<path d="M250 315c-60-44-42-94-8-131 2 31 22 39 20 67 24-29 30-53 24-78 48 46 47 103 9 142z" fill="#d71920" stroke="#a00" stroke-width="4"/><path d="M250 314c-31-27-20-57-3-79 3 20 13 25 13 43 14-17 18-31 14-46 26 28 24 57 4 82z" fill="#ff9b18"/>
+<g font-family="Georgia,serif" font-weight="bold" text-anchor="middle" fill="#080808" stroke="#fff" stroke-width="7" paint-order="stroke" font-style="italic">
+<text x="250" y="72" font-size="48">Peace Valley</text><text x="250" y="222" font-size="39">Volunteer</text><text x="250" y="267" font-size="42">Fire Dept.</text><text x="250" y="478" font-size="48">White Church</text></g>
+<text x="250" y="365" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#111">Neighbors helping</text><text x="250" y="389" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="bold" fill="#111">Neighbors</text>
+</svg>

@@ -123,11 +123,9 @@ function buildPdf(){
   const heading=panel.querySelector("h2")?.textContent?.trim();if(heading)rows.push({text:heading,kind:"heading"});
   panel.querySelectorAll(".field").forEach(field=>{
    if(field.classList.contains("hidden"))return;
-   const control=field.querySelector("input:not([type=file]),select,textarea");
-   if(!control)return;
+   const control=field.querySelector("input:not([type=file]),select,textarea");if(!control)return;
    const label=field.querySelector("label")?.textContent?.trim()||control.id;
-   const value=(control.value||"").trim();
-   if(value)rows.push({text:label+": "+value,kind:"body"});
+   const value=(control.value||"").trim();if(value)rows.push({text:label+": "+value,kind:"body"});
   });
   rows.push({text:"",kind:"space"});
  });
@@ -140,27 +138,41 @@ function buildPdf(){
   words.forEach(word=>{const next=line?line+" "+word:word;if(next.length>88&&line){lines.push({text:line,kind:"body"});line=word;}else line=next;});
   if(line)lines.push({text:line,kind:"body"});
  });
- const pages=[];let page=[];let y=744;
+ const pages=[];let page=[],y=710;
  lines.forEach(line=>{const step=line.kind==="heading"?22:15;if(y<55){pages.push(page);page=[];y=744;}page.push({...line,y});y-=step;});
  if(page.length)pages.push(page);
- const objects=[];
+ const enc=new TextEncoder(),objects=[];
  const add=obj=>(objects.push(obj),objects.length);
- const catalog=add("");const pagesObj=add("");const font=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");const bold=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
- const pageIds=[];
- pages.forEach(items=>{
-  let stream="";items.forEach(line=>{if(!line.text)return;const isHead=line.kind==="heading";stream+="BT /"+(isHead?"F2":"F1")+" "+(isHead?13:9.5)+" Tf 48 "+line.y+" Td ("+pdfEscape(line.text)+") Tj ET\n";});
-  const content=add("<< /Length "+stream.length+" >>\nstream\n"+stream+"endstream");
-  const pageId=add("<< /Type /Page /Parent "+pagesObj+" 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> >> /Contents "+content+" 0 R >>");
+ const catalog=add(""),pagesObj=add("");
+ const font=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+ const bold=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
+ const logoEl=document.querySelector(".brand-logo img");
+ const data=(logoEl?.src||"").split(",")[1]||"";
+ if(!data)throw new Error("Department logo is missing");
+ const bin=atob(data),jpg=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)jpg[i]=bin.charCodeAt(i);
+ const imgHead=enc.encode("<< /Type /XObject /Subtype /Image /Width 192 /Height 192 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+jpg.length+" >>\nstream\n");
+ const imgTail=enc.encode("\nendstream");
+ const imgObj=new Uint8Array(imgHead.length+jpg.length+imgTail.length);imgObj.set(imgHead);imgObj.set(jpg,imgHead.length);imgObj.set(imgTail,imgHead.length+jpg.length);
+ const imageId=add(imgObj),pageIds=[];
+ pages.forEach((items,index)=>{
+  let stream="";
+  if(index===0)stream+="q 64 0 0 64 48 724 cm /Logo Do Q\nBT /F2 14 Tf 126 766 Td (PEACE VALLEY-WHITE CHURCH FIRE DEPARTMENT) Tj ET\nBT /F2 11 Tf 126 747 Td (OFFICIAL INCIDENT REPORT) Tj ET\n";
+  items.forEach(line=>{if(!line.text)return;const h=line.kind==="heading";stream+="BT /"+(h?"F2":"F1")+" "+(h?13:9.5)+" Tf 48 "+line.y+" Td ("+pdfEscape(line.text)+") Tj ET\n";});
+  const bytes=enc.encode(stream),content=add("<< /Length "+bytes.length+" >>\nstream\n"+stream+"endstream");
+  const pageId=add("<< /Type /Page /Parent "+pagesObj+" 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> /XObject << /Logo "+imageId+" 0 R >> >> /Contents "+content+" 0 R >>");
   pageIds.push(pageId);
  });
  objects[catalog-1]="<< /Type /Catalog /Pages "+pagesObj+" 0 R >>";
  objects[pagesObj-1]="<< /Type /Pages /Kids ["+pageIds.map(id=>id+" 0 R").join(" ")+"] /Count "+pageIds.length+" >>";
- let pdf="%PDF-1.4\n";const offsets=[0];
- objects.forEach((obj,i)=>{offsets.push(new TextEncoder().encode(pdf).length);pdf+=(i+1)+" 0 obj\n"+obj+"\nendobj\n";});
- const xref=new TextEncoder().encode(pdf).length;pdf+="xref\n0 "+(objects.length+1)+"\n0000000000 65535 f \n";
- for(let i=1;i<offsets.length;i++)pdf+=String(offsets[i]).padStart(10,"0")+" 00000 n \n";
- pdf+="trailer\n<< /Size "+(objects.length+1)+" /Root "+catalog+" 0 R >>\nstartxref\n"+xref+"\n%%EOF";
- return new Blob([pdf],{type:"application/pdf"});
+ const chunks=[enc.encode("%PDF-1.4\n")],offsets=[0];let total=chunks[0].length;
+ objects.forEach((obj,i)=>{
+  offsets.push(total);const head=enc.encode((i+1)+" 0 obj\n"),body=typeof obj==="string"?enc.encode(obj):obj,tail=enc.encode("\nendobj\n");
+  chunks.push(head,body,tail);total+=head.length+body.length+tail.length;
+ });
+ const xref=total;let table="xref\n0 "+(objects.length+1)+"\n0000000000 65535 f \n";
+ for(let i=1;i<offsets.length;i++)table+=String(offsets[i]).padStart(10,"0")+" 00000 n \n";
+ table+="trailer\n<< /Size "+(objects.length+1)+" /Root "+catalog+" 0 R >>\nstartxref\n"+xref+"\n%%EOF";
+ chunks.push(enc.encode(table));return new Blob(chunks,{type:"application/pdf"});
 }
 $("pdfBtn").addEventListener("click",()=>{
  if(!$("reportForm").reportValidity())return;

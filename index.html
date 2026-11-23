@@ -107,7 +107,7 @@ small.help{display:block;color:var(--muted);font-size:12px;margin-top:4px}.hidde
 <div class="field full"><label for="signature">Officer signature (type full name)</label><input id="signature"></div>
 <div class="field"><label for="reviewdate">Review date</label><input id="reviewdate" type="date"></div>
 </div></section>
-<div class="actions"><button class="btn primary" type="button" id="pdfBtn">Generate / Download PDF</button><button class="btn secondary" type="button" id="clearBtn">Clear form</button></div>
+<div class="actions"><button class="btn primary" type="button" id="pdfBtn">Generate / Download PDF</button><button class="btn secondary" type="button" id="clearBtn">Clear form</button></div><div id="pdfStatus" role="status" aria-live="polite" style="font-size:13px;color:#236642;margin:8px 2px"></div>
 </form>
 <div class="footer">PVWC Fire Department • Incident reports are completed and distributed by department personnel.</div>
 </main>
@@ -124,15 +124,72 @@ const printTextareas=[];
 window.addEventListener("beforeprint",()=>{document.querySelectorAll("#reportForm textarea").forEach(el=>{const out=document.createElement("div");out.className="print-value";out.textContent=el.value||" ";el.insertAdjacentElement("afterend",out);printTextareas.push(out)})});
 window.addEventListener("afterprint",()=>{printTextareas.splice(0).forEach(el=>el.remove())});
 $("attachments").addEventListener("change",e=>{photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];$("photoList").replaceChildren();Array.from(e.target.files||[]).forEach(file=>{if(!file.type.startsWith("image/"))return;const url=URL.createObjectURL(file);photoUrls.push(url);const img=document.createElement("img");img.src=url;img.alt="Attached incident photo";$("photoList").append(img)})});
-$("pdfBtn").addEventListener("click",()=>{
-if(!$("reportForm").reportValidity())return;
-const oldTitle=document.title;
-const safe=($("number").value.trim()||$("date").value||"Report").replace(/[^a-z0-9_-]/gi,"-");
-document.title="PVWC-Incident-"+safe;
-const restore=()=>{document.title=oldTitle;};
-window.addEventListener("afterprint",restore,{once:true});
-window.print();
-setTimeout(restore,120000);
+function pdfEscape(value){return String(value).normalize("NFKD").replace(/[\\u2018\\u2019]/g,"'").replace(/[\\u201C\\u201D]/g,'"').replace(/[\\u2013\\u2014]/g,"-").replace(/[^\\x20-\\xFF]/g,"?").replace(/\\\\/g,"\\\\\\\\").replace(/\\(/g,"\\\\(").replace(/\\)/g,"\\\\)");}
+function buildPdf(){
+ const rows=[];
+ document.querySelectorAll("#reportForm .panel").forEach(panel=>{
+  if(panel.classList.contains("hidden"))return;
+  const heading=panel.querySelector("h2")?.textContent?.trim();if(heading)rows.push({text:heading,kind:"heading"});
+  panel.querySelectorAll(".field").forEach(field=>{
+   if(field.classList.contains("hidden"))return;
+   const control=field.querySelector("input:not([type=file]),select,textarea");
+   if(!control)return;
+   const label=field.querySelector("label")?.textContent?.trim()||control.id;
+   const value=(control.value||"").trim();
+   if(value)rows.push({text:label+": "+value,kind:"body"});
+  });
+  rows.push({text:"",kind:"space"});
+ });
+ if($("attachments").files.length)rows.push({text:"Scene photos were selected in the form but are not embedded in this PDF. Save/share photos separately.",kind:"body"});
+ const lines=[];
+ rows.forEach(row=>{
+  if(row.kind==="heading"){lines.push({text:row.text,kind:"heading"});return;}
+  if(row.kind==="space"){lines.push({text:"",kind:"body"});return;}
+  const words=row.text.split(/\\s+/);let line="";
+  words.forEach(word=>{const next=line?line+" "+word:word;if(next.length>88&&line){lines.push({text:line,kind:"body"});line=word;}else line=next;});
+  if(line)lines.push({text:line,kind:"body"});
+ });
+ const pages=[];let page=[];let y=744;
+ lines.forEach(line=>{const step=line.kind==="heading"?22:15;if(y<55){pages.push(page);page=[];y=744;}page.push({...line,y});y-=step;});
+ if(page.length)pages.push(page);
+ const objects=[];
+ const add=obj=>(objects.push(obj),objects.length);
+ const catalog=add("");const pagesObj=add("");const font=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");const bold=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
+ const pageIds=[];
+ pages.forEach(items=>{
+  let stream="";items.forEach(line=>{if(!line.text)return;const isHead=line.kind==="heading";stream+=`BT /${isHead?"F2":"F1"} ${isHead?13:9.5} Tf 48 ${line.y} Td (${pdfEscape(line.text)}) Tj ET\\n`;});
+  const content=add(`<< /Length ${stream.length} >>\\nstream\\n${stream}endstream`);
+  const pageId=add(`<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font} 0 R /F2 ${bold} 0 R >> >> /Contents ${content} 0 R >>`);
+  pageIds.push(pageId);
+ });
+ objects[catalog-1]=`<< /Type /Catalog /Pages ${pagesObj} 0 R >>`;
+ objects[pagesObj-1]=`<< /Type /Pages /Kids [${pageIds.map(id=>id+" 0 R").join(" ")}] /Count ${pageIds.length} >>`;
+ let pdf="%PDF-1.4\\n";const offsets=[0];
+ objects.forEach((obj,i)=>{offsets.push(new TextEncoder().encode(pdf).length);pdf+=`${i+1} 0 obj\\n${obj}\\nendobj\\n`;});
+ const xref=new TextEncoder().encode(pdf).length;pdf+=`xref\\n0 ${objects.length+1}\\n0000000000 65535 f \\n`;
+ for(let i=1;i<offsets.length;i++)pdf+=String(offsets[i]).padStart(10,"0")+" 00000 n \\n";
+ pdf+=`trailer\\n<< /Size ${objects.length+1} /Root ${catalog} 0 R >>\\nstartxref\\n${xref}\\n%%EOF`;
+ return new Blob([pdf],{type:"application/pdf"});
+}
+$("pdfBtn").addEventListener("click",async()=>{
+ if(!$("reportForm").reportValidity())return;
+ const btn=$("pdfBtn"),status=$("pdfStatus");btn.disabled=true;btn.textContent="Preparing PDF…";
+ try{
+  const blob=buildPdf();const safe=($("number").value.trim()||$("date").value||"Report").replace(/[^a-z0-9_-]/gi,"-");
+  const file=new File([blob],`PVWC-Incident-${safe}.pdf`,{type:"application/pdf"});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+   await navigator.share({files:[file],title:"PVWC Incident Report"});
+   status.textContent="PDF ready to save or share.";
+  }else{
+   const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=file.name;a.style.display="none";document.body.append(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),60000);
+   status.textContent="PDF generated. Check your Downloads folder.";
+  }
+ }catch(error){
+  if(error&&error.name==="AbortError"){status.textContent="Share cancelled. Your report remains on this page.";return;}
+  status.textContent="PDF could not be generated. Please try again or use Print from your browser.";
+  console.error("PDF generation failed",error);
+ }finally{btn.disabled=false;btn.textContent="Generate / Download PDF";}
 });
 $("clearBtn").addEventListener("click",()=>{if(!confirm("Clear all report information from this page? This cannot be undone."))return;$("reportForm").reset();$("date").value=new Date().toISOString().slice(0,10);$("reviewdate").value=new Date().toISOString().slice(0,10);$("photoList").replaceChildren();photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];updateType();window.scrollTo({top:0,behavior:"smooth"})});
 window.addEventListener("beforeunload",()=>photoUrls.forEach(URL.revokeObjectURL));

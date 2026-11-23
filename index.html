@@ -124,7 +124,7 @@ const printTextareas=[];
 window.addEventListener("beforeprint",()=>{document.querySelectorAll("#reportForm textarea").forEach(el=>{const out=document.createElement("div");out.className="print-value";out.textContent=el.value||" ";el.insertAdjacentElement("afterend",out);printTextareas.push(out)})});
 window.addEventListener("afterprint",()=>{printTextareas.splice(0).forEach(el=>el.remove())});
 $("attachments").addEventListener("change",e=>{photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];$("photoList").replaceChildren();Array.from(e.target.files||[]).forEach(file=>{if(!file.type.startsWith("image/"))return;const url=URL.createObjectURL(file);photoUrls.push(url);const img=document.createElement("img");img.src=url;img.alt="Attached incident photo";$("photoList").append(img)})});
-function pdfEscape(value){return String(value).normalize("NFKD").replace(/[\\u2018\\u2019]/g,"'").replace(/[\\u201C\\u201D]/g,'"').replace(/[\\u2013\\u2014]/g,"-").replace(/[^\\x20-\\xFF]/g,"?").replace(/\\\\/g,"\\\\\\\\").replace(/\\(/g,"\\\\(").replace(/\\)/g,"\\\\)");}
+function pdfEscape(value){return String(value).normalize("NFKD").replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014]/g,"-").replace(/[^\x20-\xFF]/g,"?").replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");}
 function buildPdf(){
  const rows=[];
  document.querySelectorAll("#reportForm .panel").forEach(panel=>{
@@ -145,7 +145,7 @@ function buildPdf(){
  rows.forEach(row=>{
   if(row.kind==="heading"){lines.push({text:row.text,kind:"heading"});return;}
   if(row.kind==="space"){lines.push({text:"",kind:"body"});return;}
-  const words=row.text.split(/\\s+/);let line="";
+  const words=row.text.split(/\s+/);let line="";
   words.forEach(word=>{const next=line?line+" "+word:word;if(next.length>88&&line){lines.push({text:line,kind:"body"});line=word;}else line=next;});
   if(line)lines.push({text:line,kind:"body"});
  });
@@ -157,18 +157,18 @@ function buildPdf(){
  const catalog=add("");const pagesObj=add("");const font=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");const bold=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>");
  const pageIds=[];
  pages.forEach(items=>{
-  let stream="";items.forEach(line=>{if(!line.text)return;const isHead=line.kind==="heading";stream+=`BT /${isHead?"F2":"F1"} ${isHead?13:9.5} Tf 48 ${line.y} Td (${pdfEscape(line.text)}) Tj ET\\n`;});
-  const content=add(`<< /Length ${stream.length} >>\\nstream\\n${stream}endstream`);
-  const pageId=add(`<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font} 0 R /F2 ${bold} 0 R >> >> /Contents ${content} 0 R >>`);
+  let stream="";items.forEach(line=>{if(!line.text)return;const isHead=line.kind==="heading";stream+="BT /"+(isHead?"F2":"F1")+" "+(isHead?13:9.5)+" Tf 48 "+line.y+" Td ("+pdfEscape(line.text)+") Tj ET\n";});
+  const content=add("<< /Length "+stream.length+" >>\nstream\n"+stream+"endstream");
+  const pageId=add("<< /Type /Page /Parent "+pagesObj+" 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> >> /Contents "+content+" 0 R >>");
   pageIds.push(pageId);
  });
- objects[catalog-1]=`<< /Type /Catalog /Pages ${pagesObj} 0 R >>`;
- objects[pagesObj-1]=`<< /Type /Pages /Kids [${pageIds.map(id=>id+" 0 R").join(" ")}] /Count ${pageIds.length} >>`;
- let pdf="%PDF-1.4\\n";const offsets=[0];
- objects.forEach((obj,i)=>{offsets.push(new TextEncoder().encode(pdf).length);pdf+=`${i+1} 0 obj\\n${obj}\\nendobj\\n`;});
- const xref=new TextEncoder().encode(pdf).length;pdf+=`xref\\n0 ${objects.length+1}\\n0000000000 65535 f \\n`;
- for(let i=1;i<offsets.length;i++)pdf+=String(offsets[i]).padStart(10,"0")+" 00000 n \\n";
- pdf+=`trailer\\n<< /Size ${objects.length+1} /Root ${catalog} 0 R >>\\nstartxref\\n${xref}\\n%%EOF`;
+ objects[catalog-1]="<< /Type /Catalog /Pages "+pagesObj+" 0 R >>";
+ objects[pagesObj-1]="<< /Type /Pages /Kids ["+pageIds.map(id=>id+" 0 R").join(" ")+"] /Count "+pageIds.length+" >>";
+ let pdf="%PDF-1.4\n";const offsets=[0];
+ objects.forEach((obj,i)=>{offsets.push(new TextEncoder().encode(pdf).length);pdf+=(i+1)+" 0 obj\n"+obj+"\nendobj\n";});
+ const xref=new TextEncoder().encode(pdf).length;pdf+="xref\n0 "+(objects.length+1)+"\n0000000000 65535 f \n";
+ for(let i=1;i<offsets.length;i++)pdf+=String(offsets[i]).padStart(10,"0")+" 00000 n \n";
+ pdf+="trailer\n<< /Size "+(objects.length+1)+" /Root "+catalog+" 0 R >>\nstartxref\n"+xref+"\n%%EOF";
  return new Blob([pdf],{type:"application/pdf"});
 }
 $("pdfBtn").addEventListener("click",async()=>{

@@ -98,7 +98,7 @@ small.help{display:block;color:var(--muted);font-size:12px;margin-top:4px}.hidde
 <div class="field full"><label for="signature">Officer signature (type full name)</label><input id="signature"></div>
 <div class="field"><label for="reviewdate">Review date</label><input id="reviewdate" type="date"></div>
 </div></section>
-<div class="actions"><button class="btn primary" type="button" id="pdfBtn">Generate / Download PDF</button><button class="btn secondary" type="button" id="clearBtn">Clear form</button></div><div id="pdfStatus" role="status" aria-live="polite" style="font-size:13px;color:#236642;margin:8px 2px"></div>
+<div class="actions"><button class="btn primary" type="button" id="pdfBtn">Download PDF</button><button class="btn secondary" type="button" id="printBtn">Print Report</button><button class="btn secondary" type="button" id="clearBtn">Clear form</button></div><div id="pdfStatus" role="status" aria-live="polite" style="font-size:13px;color:#236642;margin:8px 2px"></div>
 </form>
 <div class="footer">PVWC Fire Department • Incident reports are completed and distributed by department personnel.</div>
 </main>
@@ -162,25 +162,22 @@ function buildPdf(){
  pdf+="trailer\n<< /Size "+(objects.length+1)+" /Root "+catalog+" 0 R >>\nstartxref\n"+xref+"\n%%EOF";
  return new Blob([pdf],{type:"application/pdf"});
 }
-$("pdfBtn").addEventListener("click",async()=>{
+$("pdfBtn").addEventListener("click",()=>{
  if(!$("reportForm").reportValidity())return;
  const btn=$("pdfBtn"),status=$("pdfStatus");btn.disabled=true;btn.textContent="Preparing PDF…";
  try{
   const blob=buildPdf();const safe=($("number").value.trim()||$("date").value||"Report").replace(/[^a-z0-9_-]/gi,"-");
-  const file=new File([blob],`PVWC-Incident-${safe}.pdf`,{type:"application/pdf"});
-  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],title:"PVWC Incident Report"});
-   status.textContent="PDF ready to save or share.";
-  }else{
-   const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=file.name;a.style.display="none";document.body.append(a);a.click();a.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),60000);
-   status.textContent="PDF generated. Check your Downloads folder.";
-  }
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`PVWC-Incident-${safe}.pdf`;a.style.display="none";document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),120000);
+  status.textContent="PDF generated. Check your Downloads folder.";
  }catch(error){
-  if(error&&error.name==="AbortError"){status.textContent="Share cancelled. Your report remains on this page.";return;}
-  status.textContent="PDF could not be generated. Please try again or use Print from your browser.";
+  status.textContent="PDF could not be generated. Please try again.";
   console.error("PDF generation failed",error);
- }finally{btn.disabled=false;btn.textContent="Generate / Download PDF";}
+ }finally{btn.disabled=false;btn.textContent="Download PDF";}
+});
+$("printBtn").addEventListener("click",()=>{
+ if(!$("reportForm").reportValidity())return;
+ window.print();
 });
 $("clearBtn").addEventListener("click",()=>{if(!confirm("Clear all report information from this page? This cannot be undone."))return;$("reportForm").reset();$("date").value=new Date().toISOString().slice(0,10);$("reviewdate").value=new Date().toISOString().slice(0,10);$("photoList").replaceChildren();photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];updateType();window.scrollTo({top:0,behavior:"smooth"})});
 window.addEventListener("beforeunload",()=>photoUrls.forEach(URL.revokeObjectURL));

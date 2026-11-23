@@ -111,7 +111,6 @@ small.help{display:block;color:var(--muted);font-size:12px;margin-top:4px}.hidde
 </form>
 <div class="footer">PVWC Fire Department • Incident reports are completed and distributed by department personnel.</div>
 </main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <script>
 (function(){
 const $=id=>document.getElementById(id);
@@ -125,38 +124,15 @@ const printTextareas=[];
 window.addEventListener("beforeprint",()=>{document.querySelectorAll("#reportForm textarea").forEach(el=>{const out=document.createElement("div");out.className="print-value";out.textContent=el.value||" ";el.insertAdjacentElement("afterend",out);printTextareas.push(out)})});
 window.addEventListener("afterprint",()=>{printTextareas.splice(0).forEach(el=>el.remove())});
 $("attachments").addEventListener("change",e=>{photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];$("photoList").replaceChildren();Array.from(e.target.files||[]).forEach(file=>{if(!file.type.startsWith("image/"))return;const url=URL.createObjectURL(file);photoUrls.push(url);const img=document.createElement("img");img.src=url;img.alt="Attached incident photo";$("photoList").append(img)})});
-$("pdfBtn").addEventListener("click",async()=>{
+$("pdfBtn").addEventListener("click",()=>{
 if(!$("reportForm").reportValidity())return;
-if(!window.jspdf||!window.jspdf.jsPDF){alert("The PDF generator did not load. Check your internet connection and reload this page.");return;}
-const {jsPDF}=window.jspdf;
-const doc=new jsPDF({unit:"pt",format:"letter"});
-const margin=42,pageW=612,pageH=792,lineH=15;
-let y=margin;
-doc.setFont("helvetica","bold");doc.setFontSize(15);doc.text("PEACE VALLEY–WHITE CHURCH FIRE DEPARTMENT",pageW/2,y,{align:"center"});y+=22;
-doc.setFontSize(12);doc.text("OFFICIAL INCIDENT REPORT",pageW/2,y,{align:"center"});y+=24;
-doc.setFont("helvetica","normal");doc.setFontSize(9);doc.text("Department contact: pvwcvfd65788@gmail.com",pageW/2,y,{align:"center"});y+=22;
-function ensure(h){if(y+h>pageH-margin){doc.addPage();y=margin;}}
-function section(name){ensure(28);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.setTextColor(23,75,50);doc.text(name,margin,y);y+=17;doc.setTextColor(20,30,22);}
-function field(label,value){if(!value)return;const lines=doc.splitTextToSize(String(value),pageW-margin*2-110);const h=Math.max(lineH,lines.length*lineH)+5;ensure(h);doc.setFont("helvetica","bold");doc.setFontSize(9);doc.text(label+":",margin,y);doc.setFont("helvetica","normal");doc.text(lines,margin+110,y);y+=h;}
-Array.from(document.querySelectorAll("#reportForm .panel")).filter(p=>!p.classList.contains("hidden")).forEach(panel=>{section(panel.querySelector("h2")?.textContent||"Report section");panel.querySelectorAll(".field").forEach(w=>{const el=w.querySelector("input:not([type=file]),select,textarea");if(!el)return;const label=w.querySelector("label")?.textContent?.replace(/\s*\*$/,"")||el.id;let value=el.tagName==="SELECT"?(el.selectedOptions[0]?.textContent||""):(el.value||"");if(value==="Select"||value==="Choose report type")value="";field(label,value);});});
-const pages=doc.internal.getNumberOfPages();for(let p=1;p<=pages;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(100);doc.text("PVWC Fire Department • Confidential department record",margin,pageH-20);doc.text("Page "+p+" of "+pages,pageW-margin,pageH-20,{align:"right"});}
+const oldTitle=document.title;
 const safe=($("number").value.trim()||$("date").value||"Report").replace(/[^a-z0-9_-]/gi,"-");
-const filename="PVWC-Incident-"+safe+".pdf";
-const blob=doc.output("blob");
-const file=new File([blob],filename,{type:"application/pdf"});
-try{
- if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
-  await navigator.share({files:[file],title:filename});
-  return;
- }
-}catch(err){if(err&&err.name==="AbortError")return;}
-const url=URL.createObjectURL(blob);
-const opened=window.open(url,"_blank");
-if(!opened){
- const link=document.createElement("a");link.href=url;link.download=filename;link.textContent="Tap here to open your PDF";link.style.cssText="display:block;margin:16px;padding:14px;background:#174b32;color:white;text-align:center;border-radius:10px";
- const box=document.createElement("div");box.style.cssText="position:fixed;inset:0;background:#fff;z-index:9999;padding:24px;overflow:auto";const msg=document.createElement("p");msg.textContent="Your PDF is ready. Tap the link, then use the iPhone Share button and choose Save to Files.";box.append(msg,link);document.body.append(box);
-}
-setTimeout(()=>URL.revokeObjectURL(url),60000);
+document.title="PVWC-Incident-"+safe;
+const restore=()=>{document.title=oldTitle;};
+window.addEventListener("afterprint",restore,{once:true});
+window.print();
+setTimeout(restore,120000);
 });
 $("clearBtn").addEventListener("click",()=>{if(!confirm("Clear all report information from this page? This cannot be undone."))return;$("reportForm").reset();$("date").value=new Date().toISOString().slice(0,10);$("reviewdate").value=new Date().toISOString().slice(0,10);$("photoList").replaceChildren();photoUrls.forEach(URL.revokeObjectURL);photoUrls=[];updateType();window.scrollTo({top:0,behavior:"smooth"})});
 window.addEventListener("beforeunload",()=>photoUrls.forEach(URL.revokeObjectURL));

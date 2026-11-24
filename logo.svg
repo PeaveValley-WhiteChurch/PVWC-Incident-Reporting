@@ -1,27 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Peace Valley White Church Volunteer Fire Department emblem">
-<defs>
- <linearGradient id="silver" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".48" stop-color="#9ca3af"/><stop offset="1" stop-color="#e5e7eb"/></linearGradient>
- <linearGradient id="red" x2="0" y2="1"><stop stop-color="#ff4545"/><stop offset="1" stop-color="#a40000"/></linearGradient>
- <path id="toparc" d="M 34 92 Q 128 8 222 92"/>
-</defs>
-<rect width="256" height="256" rx="22" fill="#08090b"/>
-<path d="M128 5 L157 28 L201 22 L207 66 L251 96 L229 128 L251 160 L207 190 L201 234 L157 228 L128 251 L99 228 L55 234 L49 190 L5 160 L27 128 L5 96 L49 66 L55 22 L99 28 Z" fill="#111318" stroke="url(#silver)" stroke-width="7" stroke-linejoin="round"/>
-<path d="M128 13 L154 35 L194 29 L200 70 L239 97 L219 128 L239 159 L200 186 L194 227 L154 221 L128 243 L102 221 L62 227 L56 186 L17 159 L37 128 L17 97 L56 70 L62 29 L102 35 Z" fill="#14171c" stroke="url(#red)" stroke-width="4" stroke-linejoin="round"/>
-<text fill="#fff" font-family="Georgia,serif" font-size="18" font-weight="bold" text-anchor="middle" letter-spacing="1"><textPath href="#toparc" startOffset="50%">PEACE VALLEY</textPath></text>
-<text x="128" y="83" fill="#fff" font-family="Georgia,serif" font-size="17" font-weight="bold" text-anchor="middle" letter-spacing="1">WHITE CHURCH</text>
-<circle cx="128" cy="139" r="53" fill="#090a0c" stroke="url(#silver)" stroke-width="3"/>
-<circle cx="128" cy="139" r="47" fill="none" stroke="#b40000" stroke-width="3"/>
-<g stroke="#c7cbd1" stroke-width="8" stroke-linecap="round" fill="none">
- <path d="M91 172 L163 104 M165 172 L93 104"/>
-</g>
-<g fill="url(#silver)" stroke="#5d626a" stroke-width="1.5">
- <path d="M84 98 L96 86 L110 101 L99 112 Z"/><path d="M172 98 L160 86 L146 101 L157 112 Z"/>
- <path d="M80 94 L72 86 L86 68 L101 83 Z"/><path d="M176 94 L184 86 L170 68 L155 83 Z"/>
-</g>
-<path d="M101 133 Q100 110 128 108 Q156 110 155 133 L150 157 Q128 169 106 157 Z" fill="url(#red)" stroke="#e5e7eb" stroke-width="3"/>
-<path d="M111 131 Q128 119 145 131 L142 149 L114 149 Z" fill="#14171c" stroke="#e5e7eb" stroke-width="2"/>
-<text x="128" y="143" fill="#fff" font-family="Georgia,serif" font-size="16" font-weight="bold" text-anchor="middle">FIRE</text>
-<path d="M70 183 Q128 197 186 183 L178 207 Q128 222 78 207 Z" fill="#111318" stroke="url(#red)" stroke-width="4"/>
-<text x="128" y="202" fill="#fff" font-family="Georgia,serif" font-size="19" font-weight="bold" text-anchor="middle" letter-spacing="2">FIRE</text>
-<text x="128" y="225" fill="#fff" font-family="Georgia,serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="1.2">VOLUNTEER DEPARTMENT</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="44" fill="#fff"/>
+<path d="M256 18 310 65 383 53 395 126 494 180 447 256 494 332 395 386 383 459 310 447 256 494 202 447 129 459 117 386 18 332 65 256 18 180 117 126 129 53 202 65Z" fill="#15191d" stroke="#a71920" stroke-width="13" stroke-linejoin="round"/>
+<path d="M256 34 303 77 369 67 380 133 464 181 424 256 464 331 380 379 369 445 303 435 256 478 209 435 143 445 132 379 48 331 88 256 48 181 132 133 143 67 209 77Z" fill="#22282e" stroke="#d8dce0" stroke-width="6" stroke-linejoin="round"/>
+<text x="256" y="111" fill="#fff" font-family="Arial,sans-serif" font-size="37" font-weight="700" text-anchor="middle" letter-spacing="2">PEACE VALLEY</text>
+<text x="256" y="155" fill="#fff" font-family="Arial,sans-serif" font-size="30" font-weight="700" text-anchor="middle" letter-spacing="3">WHITE CHURCH</text>
+<circle cx="256" cy="270" r="105" fill="#101316" stroke="#d8dce0" stroke-width="8"/>
+<circle cx="256" cy="270" r="91" fill="none" stroke="#a71920" stroke-width="7"/>
+<g stroke="#d8dce0" stroke-width="16" stroke-linecap="round" fill="none"><path d="M190 330 322 206 M322 330 190 206"/></g>
+<g fill="#d8dce0" stroke="#777" stroke-width="4"><path d="m181 214-26-26 37-43 34 34Z"/><path d="m331 214 26-26-37-43-34 34Z"/></g>
+<path d="M211 254 Q211 204 256 199 Q301 204 301 254 L290 302 Q256 324 222 302Z" fill="#a71920" stroke="#fff" stroke-width="7"/>
+<path d="M228 250 Q256 231 284 250 L280 281 232 281Z" fill="#20262b" stroke="#fff" stroke-width="4"/>
+<text x="256" y="273" fill="#fff" font-family="Arial,sans-serif" font-size="27" font-weight="700" text-anchor="middle">PVWC</text>
+<path d="M107 367 Q256 410 405 367 L388 422 Q256 463 124 422Z" fill="#101316" stroke="#a71920" stroke-width="8"/>
+<text x="256" y="414" fill="#fff" font-family="Arial,sans-serif" font-size="43" font-weight="800" text-anchor="middle" letter-spacing="5">FIRE</text>
+<text x="256" y="453" fill="#fff" font-family="Arial,sans-serif" font-size="19" font-weight="700" text-anchor="middle" letter-spacing="2">VOLUNTEER DEPARTMENT</text>
 </svg>

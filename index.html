@@ -27,7 +27,7 @@ small.help{display:block;color:var(--muted);font-size:12px;margin-top:4px}.hidde
 <body>
 <header><div class="brand-logo"><img src="logo.svg" alt="Peace Valley-White Church Volunteer Fire Department logo"></div><h1>PVWC Incident Reporting</h1><p>Peace Valley–White Church Fire Department</p></header>
 <main>
-<div class="department-contact"><strong>PEACE VALLEY–WHITE CHURCH FIRE DEPARTMENT</strong>Official Department Incident Report<br><a href="mailto:pvwcvfd65788@gmail.com">pvwcvfd65788@gmail.com</a></div>
+<div class="department-contact"><strong>PEACE VALLEY–WHITE CHURCH FIRE DEPARTMENT</strong>Official Department Incident Report<br><b>After downloading the completed PDF, email the report to:</b><br><a href="mailto:pvwcfpd@gmail.com">pvwcfpd@gmail.com</a></div>
 <div class="notice"><strong>Privacy:</strong> This form does not save or transmit reports. Information stays in this browser tab while you complete it. Generate a PDF and distribute it through your department's approved process. Close or clear the form when finished. Do not leave patient information on a shared device.</div>
 <form id="reportForm">
 <section class="panel">
@@ -160,7 +160,7 @@ async function buildPdf(){
  const imageId=add(imgObj),pageIds=[];
  pages.forEach((items,index)=>{
   let stream="";
-  if(index===0)stream+="q 64 0 0 64 48 724 cm /Logo Do Q\nBT /F2 14 Tf 126 766 Td (PEACE VALLEY-WHITE CHURCH FIRE DEPARTMENT) Tj ET\nBT /F2 11 Tf 126 747 Td (OFFICIAL INCIDENT REPORT) Tj ET\n";
+  if(index===0)stream+="q 64 0 0 64 48 724 cm /Logo Do Q\nBT /F2 14 Tf 126 766 Td (PEACE VALLEY-WHITE CHURCH FIRE DEPARTMENT) Tj ET\nBT /F2 11 Tf 126 747 Td (OFFICIAL INCIDENT REPORT) Tj ET\nBT /F2 9 Tf 126 730 Td (EMAIL COMPLETED REPORTS TO: pvwcfpd@gmail.com) Tj ET\n";
   items.forEach(line=>{if(!line.text)return;const h=line.kind==="heading";stream+="BT /"+(h?"F2":"F1")+" "+(h?13:9.5)+" Tf 48 "+line.y+" Td ("+pdfEscape(line.text)+") Tj ET\n";});
   const bytes=enc.encode(stream),content=add("<< /Length "+bytes.length+" >>\nstream\n"+stream+"endstream");
   const pageId=add("<< /Type /Page /Parent "+pagesObj+" 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 "+font+" 0 R /F2 "+bold+" 0 R >> /XObject << /Logo "+imageId+" 0 R >> >> /Contents "+content+" 0 R >>");
